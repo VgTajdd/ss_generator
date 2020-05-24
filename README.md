@@ -1,2 +1,3 @@
-# bin_packing_bt
-Bin Packing using binary tree
+# SpriteSheet Generator
+Bin Packing algorithm implemented using binary tree concept.
+Developed in C++ & Qt.
