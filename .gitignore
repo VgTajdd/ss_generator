@@ -1,0 +1,11 @@
+.vs/
+x64/
+GeneratedFiles/
+intermediate/
+
+*.tlog
+*.user
+*.obj
+*.ilk
+*.log
+*.pdb
