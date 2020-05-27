@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName Include="QtUiItem">
+      <Targets>QtuiBuildTarget</Targets>
+    </AvailableItemName>
+    <AvailableItemName Include="QtMoItem">
+      <Targets>QtmoBuildTarget</Targets>
+    </AvailableItemName>
+    <AvailableItemName Include="QtResItem">
+      <Targets>QtresBuildTarget</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+
+  <Target Name="QtuiBuildTarget" AfterTargets="CustomBuild" Inputs="%(QtUiItem.Identity)" Outputs="GeneratedFiles/ui_%(QtUiItem.Filename).h">
+    <Message Text="Qt UIC %(QtUiItem.Filename)%(QtUiItem.Extension)" Importance="High"/>
+    <MakeDir Directories = "GeneratedFiles" />
+    <Exec Command="$(TPLIBS)qt/Qt5.14.2/5.14.2/msvc2017_64/bin/uic %(QtUiItem.Identity) -o GeneratedFiles/ui_%(QtUiItem.Filename).h"/>
+  </Target>
+
+  <Target Name="QtmoBuildTarget" AfterTargets="CustomBuild" Inputs="%(QtMoItem.Identity)" Outputs="GeneratedFiles/moc_%(QtMoItem.Filename).cpp">
+    <Message Text="Qt MOC %(QtMoItem.Filename)%(QtMoItem.Extension)" Importance="High"/>
+    <MakeDir Directories = "GeneratedFiles" />
+    <Exec Command="$(TPLIBS)qt/Qt5.14.2/5.14.2/msvc2017_64/bin/moc.exe %(QtMoItem.Identity) -o GeneratedFiles/moc_%(QtMoItem.Filename).cpp"/>
+  </Target>
+
+  <Target Name="QtresBuildTarget" AfterTargets="CustomBuild" Inputs="%(QtResItem.Identity)" Outputs="$(OutDir)resources/resources.rcc">
+    <Message Text="Qt RCC %(QtResItem.Filename)%(QtResItem.Extension)" Importance="High"/>
+    <Exec Command="$(TPLIBS)qt/Qt5.14.2/5.14.2/msvc2017_64/bin/rcc -binary %(QtResItem.FullPath) -o $(OutDir)resources/resources.rcc"/>
+  </Target>
+
+  <Target Name="QtCleanTarget" AfterTargets="Clean">
+    <RemoveDir Directories = "GeneratedFiles" />
+  </Target>
+
+</Project>
