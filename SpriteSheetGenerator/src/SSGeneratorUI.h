@@ -10,10 +10,10 @@ class SSGeneratorUI : public QMainWindow
 public:
     SSGeneratorUI( QWidget* parent = 0 );
     ~SSGeneratorUI();
-//public Q_SLOTS:
-//    void btnFontSlot();
-//    void btnOutputSlot();
-//    void btnGenerateSlot();
+
+public Q_SLOTS:
+    void btnFolderSlot();
+    void btnGenerateSlot();
 
 private:
     Ui::SSGeneratorUI* m_ui;

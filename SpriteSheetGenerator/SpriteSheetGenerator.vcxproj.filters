@@ -26,14 +26,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoItem Include="src\SSGeneratorUI.ui" />
+    <QtMoItem Include="src\SSGeneratorUI.h">
+      <Filter>Header Files</Filter>
+    </QtMoItem>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\SSGeneratorUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_SSGeneratorUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUiItem Include="src\SSGeneratorUI.ui" />
   </ItemGroup>
 </Project>

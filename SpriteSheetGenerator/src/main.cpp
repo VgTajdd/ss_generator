@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <QPalette>
 #include "SSGeneratorUI.h"
 
 int main( int argc, char* argv[] )
@@ -14,5 +13,6 @@ int main( int argc, char* argv[] )
     SSGeneratorUI ssgenUI;
     ssgenUI.show();
 
+    app.setActiveWindow( &ssgenUI );
     return app.exec();
 }
