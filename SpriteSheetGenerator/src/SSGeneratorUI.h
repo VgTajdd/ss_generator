@@ -17,6 +17,7 @@ public Q_SLOTS:
 
 private:
     Ui::SSGeneratorUI* m_ui;
+    std::vector< QString > m_filenames;
 };
 
 #endif // SS_GENERATOR_UI_H

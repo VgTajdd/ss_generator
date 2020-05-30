@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\moc_SSGeneratorUI.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SSGenerator.cpp" />
     <ClCompile Include="src\SSGeneratorUI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_SSGeneratorUI.h" />
+    <ClInclude Include="src\SSGenerator.h" />
     <QtMoItem Include="src\SSGeneratorUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,7 @@
 #include "SSGeneratorUI.h"
 
+#include "SSGenerator.h"
+
 #include <QFileDialog>
 //#include <QDebug>
 //#include <QListWidgetItem>
@@ -39,6 +41,7 @@ void SSGeneratorUI::btnFolderSlot()
     m_ui->folderLabel->setText( folderPath );
 
     m_ui->listWidget->clear();
+    m_filenames.clear();
 
     if ( !folderPath.isEmpty() )
     {
@@ -51,15 +54,36 @@ void SSGeneratorUI::btnFolderSlot()
         QFileInfoList filelistinfo = dir.entryInfoList();
         foreach( const QFileInfo& fileinfo, filelistinfo )
         {
-            QString imageFile = fileinfo.absoluteFilePath();
-            m_ui->listWidget->addItem( imageFile );
+            /*QString imageFile = fileinfo.absoluteFilePath();*/
+            m_ui->listWidget->addItem( fileinfo.fileName() );
+            m_filenames.push_back( fileinfo.fileName() );
         }
     }
 }
 
 void SSGeneratorUI::btnGenerateSlot()
 {
+    if ( m_filenames.empty() || m_ui->folderLabel->text().isEmpty() )
+    {
+        return;
+    }
 
+    QSize size( 256, 256 );
+    switch ( m_ui->comboBox->currentIndex() )
+    {
+        case 1: size = { 512, 512 };    break;
+        case 2: size = { 1024, 1024 };  break;
+        case 3: size = { 2048, 2048 };  break;
+        default:                        break;
+    }
+
+    bool ok = SSGenerator::generateSpriteSheets( m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
+
+    if ( ok )
+    {
+        // Show atlas.
+
+    }
 }
 
 SSGeneratorUI::~SSGeneratorUI()

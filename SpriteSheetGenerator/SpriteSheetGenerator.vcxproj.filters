@@ -24,6 +24,9 @@
     <ClCompile Include="src\SSGeneratorUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SSGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoItem Include="src\SSGeneratorUI.h">
@@ -32,6 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_SSGeneratorUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SSGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
