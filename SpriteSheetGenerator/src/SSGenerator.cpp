@@ -149,7 +149,8 @@ Node* SSGenerator::growDown( float w, float h )
 	}
 }
 
-bool SSGenerator::generateSpriteSheets( const std::vector< QString >& filenames,
+bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
+										const std::vector< QString >& filenames,
 										const QString& folderPath,
 										const bool automaticSize,
 										const QSize& fixedSize )
@@ -185,7 +186,7 @@ bool SSGenerator::generateSpriteSheets( const std::vector< QString >& filenames,
 	// Sort by width (descendent).
 	std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.w > b.w; } );
 
-	if ( root )
+	if ( root != nullptr )
 	{
 		delete root;
 		root = nullptr;
@@ -211,14 +212,12 @@ bool SSGenerator::generateSpriteSheets( const std::vector< QString >& filenames,
 
 	fit( images, automaticSize );
 
-	// TODO :
-	// Remove old atlas.
-
 	QString fmt = "_yyyyMMdd_hhmmss";
 	QString time = QDateTime::currentDateTime().toString( fmt );
 
-	QImage atlas( QSize( root->w, root->h ), QImage::Format_RGB32 );
-	atlas.fill( QColor( 0, 0, 0, 0 ) );
+	QImage atlas( QSize( root->w, root->h ), QImage::Format_RGBA8888 );
+	atlas.fill( Qt::transparent );
+
 	QPainter painter( &atlas );
 	for ( const auto& image : images )
 	{
@@ -227,9 +226,12 @@ bool SSGenerator::generateSpriteSheets( const std::vector< QString >& filenames,
 		painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
 	}
 	painter.end();
-	atlas.save( folderPath + "/atlas" + time + ".png", "PNG" );
 
-	if ( root )
+	QString atlasFilename = folderPath + "/atlas" + time + ".png";
+	atlas.save( atlasFilename, "PNG" );
+	spriteSheets.push_back( atlasFilename );
+
+	if ( root != nullptr )
 	{
 		delete root;
 		root = nullptr;

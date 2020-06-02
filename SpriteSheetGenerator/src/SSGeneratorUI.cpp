@@ -77,12 +77,17 @@ void SSGeneratorUI::btnGenerateSlot()
         default:                        break;
     }
 
-    bool ok = SSGenerator::generateSpriteSheets( m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
+    std::vector< QString > spriteSheets;
+    bool ok = SSGenerator::generateSpriteSheets( spriteSheets, m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
 
     if ( ok )
     {
         // Show atlas.
-
+        QImage imageAtlas( spriteSheets[0] );
+        QLabel* myLabel = new QLabel;
+        myLabel->setPixmap( QPixmap::fromImage( imageAtlas ) );
+        QGridLayout* layout = new QGridLayout( m_ui->scrollAreaWidgetContents );
+        layout->addWidget( myLabel );
     }
 }
 

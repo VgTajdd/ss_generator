@@ -35,7 +35,7 @@ class SSGenerator
 	static Node* growRight( float w, float h );
 	static Node* growDown( float w, float h );
 public:
-	static bool generateSpriteSheets( const std::vector<QString>& filenames, const QString& folderPath, const bool automaticSize, const QSize& fixedSize );
+	static bool generateSpriteSheets( std::vector< QString >& spriteSheetes, const std::vector<QString>& filenames, const QString& folderPath, const bool automaticSize, const QSize& fixedSize );
 };
 
 #endif
