@@ -86,6 +86,7 @@ void SSGeneratorUI::btnGenerateSlot()
         QImage imageAtlas( spriteSheets[0] );
         QLabel* myLabel = new QLabel;
         myLabel->setPixmap( QPixmap::fromImage( imageAtlas ) );
+        m_ui->atlasNameLabel->setText( spriteSheets[0] );
         QGridLayout* layout = new QGridLayout( m_ui->scrollAreaWidgetContents );
         layout->addWidget( myLabel );
     }

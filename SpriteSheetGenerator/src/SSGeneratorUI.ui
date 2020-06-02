@@ -83,10 +83,20 @@
            <x>0</x>
            <y>0</y>
            <width>358</width>
-           <height>363</height>
+           <height>344</height>
           </rect>
          </property>
         </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="atlasNameLabel">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
       <item>
