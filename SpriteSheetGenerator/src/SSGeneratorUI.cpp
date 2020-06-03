@@ -3,8 +3,6 @@
 #include "SSGenerator.h"
 
 #include <QFileDialog>
-//#include <QDebug>
-//#include <QListWidgetItem>
 
 SSGeneratorUI::SSGeneratorUI( QWidget* parent ) :
     QMainWindow( parent ),
@@ -54,8 +52,24 @@ void SSGeneratorUI::btnFolderSlot()
         QFileInfoList filelistinfo = dir.entryInfoList();
         foreach( const QFileInfo& fileinfo, filelistinfo )
         {
-            /*QString imageFile = fileinfo.absoluteFilePath();*/
-            m_ui->listWidget->addItem( fileinfo.fileName() );
+            QListWidgetItem* item = new QListWidgetItem( m_ui->listWidget );
+            item->setSizeHint( QSize( item->sizeHint().width(), 18 ) );
+
+            QWidget* widgetItem = new QWidget( m_ui->listWidget );
+            widgetItem->setFixedHeight( 18 );
+            QGridLayout* layout = new QGridLayout( widgetItem );
+            QLabel* label = new QLabel( fileinfo.fileName(), m_ui->listWidget );
+            QPushButton* removeButton = new QPushButton( m_ui->listWidget );
+            removeButton->setFixedSize( 18, 18 );
+            removeButton->setText( "X" );
+            layout->addWidget( label, 0, 0 );
+            layout->addItem( new QSpacerItem( QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum ), 1, 1 );
+            layout->addWidget( removeButton, 0, 2 );
+            layout->setMargin( 0 );
+            layout->setSpacing( 0 );
+
+            m_ui->listWidget->setItemWidget( item, widgetItem );
+
             m_filenames.push_back( fileinfo.fileName() );
         }
     }
