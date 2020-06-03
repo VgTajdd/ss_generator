@@ -70,6 +70,16 @@ void SSGeneratorUI::btnFolderSlot()
 
             m_ui->listWidget->setItemWidget( item, widgetItem );
 
+            connect( removeButton, &QPushButton::clicked, [this, item, fileinfo]()
+            {
+                item->setHidden( true );
+                auto it = std::find( m_filenames.begin(), m_filenames.end(), fileinfo.fileName() );
+                if ( it != m_filenames.end() )
+                {
+                    this->m_filenames.erase( it );
+                }
+            } );
+
             m_filenames.push_back( fileinfo.fileName() );
         }
     }
