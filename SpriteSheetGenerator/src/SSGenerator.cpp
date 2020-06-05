@@ -6,6 +6,7 @@
 #include <QDateTime>
 
 Node* SSGenerator::root = nullptr;
+std::vector< Node* > SSGenerator::roots;
 
 Node::~Node()
 {
@@ -21,7 +22,7 @@ Node::~Node()
 	}
 }
 
-void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize )
+void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize, const QSize& fixedSize )
 {
 	for ( int n = 0; n < images.size(); n++ )
 	{
@@ -38,7 +39,20 @@ void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize )
 			}
 			else
 			{
-				// Create new root;
+				// Create new root.
+				roots.push_back( root );
+				root = new Node();
+				root->w = fixedSize.width();
+				root->h = fixedSize.height();
+
+				if ( auto node = findNode( root, block.w, block.h ) )
+				{
+					block.fit = splitNode( node, block.w, block.h );
+				}
+				else
+				{
+					// Something bad happened...
+				}
 			}
 		}
 	}
@@ -210,7 +224,7 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		root->h = images[0].h;
 	}
 
-	fit( images, automaticSize );
+	fit( images, automaticSize, fixedSize );
 
 	QString fmt = "_yyyyMMdd_hhmmss";
 	QString time = QDateTime::currentDateTime().toString( fmt );

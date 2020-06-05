@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <QString>
-#include <QSize>
+
+class QSize;
 
 struct Node
 {
@@ -28,7 +29,8 @@ struct Image
 class SSGenerator
 {
 	static Node* root;
-	static void fit( std::vector< Image >& images, const bool automaticSize );
+	static std::vector< Node* > roots;
+	static void fit( std::vector< Image >& images, const bool automaticSize, const QSize& fixedSize );
 	static Node* findNode( Node* root, float w, float h );
 	static Node* splitNode( Node* node, float w, float h );
 	static Node* growNode( float w, float h );
