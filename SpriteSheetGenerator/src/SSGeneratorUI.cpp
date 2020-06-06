@@ -6,7 +6,8 @@
 
 SSGeneratorUI::SSGeneratorUI( QWidget* parent ) :
     QMainWindow( parent ),
-    m_ui( new Ui::SSGeneratorUI )
+    m_ui( new Ui::SSGeneratorUI ),
+    m_currentSS( 0 )
 {
     m_ui->setupUi( this );
 
@@ -21,12 +22,24 @@ SSGeneratorUI::SSGeneratorUI( QWidget* parent ) :
     m_ui->comboBox->addItem( "1024 x 1024" );
     m_ui->comboBox->addItem( "2048 x 2048" );
 
+    m_atlasLabel = new QLabel;
+    QGridLayout* layout = new QGridLayout( m_ui->scrollAreaWidgetContents );
+    layout->addWidget( m_atlasLabel );
+
     // Connections.
     connect( m_ui->folderButton, &QPushButton::clicked, this, &SSGeneratorUI::btnFolderSlot );
     connect( m_ui->generateButton, &QPushButton::clicked, this, &SSGeneratorUI::btnGenerateSlot );
     connect( m_ui->checkBox, &QCheckBox::toggled, [this]( bool checked )
     {
         m_ui->comboBox->setDisabled( checked );
+    } );
+    connect( m_ui->nextAtlasButton, &QPushButton::clicked, [this]()
+    {
+        this->showAtlas( ( this->m_currentSS + 1 ) % (int) this->m_spriteSheets.size() );
+    } );
+    connect( m_ui->previousAtlasButton, &QPushButton::clicked, [this]()
+    {
+        this->showAtlas( ( this->m_currentSS - 1 ) % (int) this->m_spriteSheets.size() );
     } );
 }
 
@@ -36,10 +49,19 @@ void SSGeneratorUI::btnFolderSlot()
                                                             tr( "Select images folder" ),
                                                             "",
                                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+
+    if ( folderPath.isEmpty() )
+    {
+        return;
+    }
+
     m_ui->folderLabel->setText( folderPath );
 
+    // Reset everything.
     m_ui->listWidget->clear();
     m_filenames.clear();
+    m_spriteSheets.clear();
+    showAtlas( -1 );
 
     if ( !folderPath.isEmpty() )
     {
@@ -101,19 +123,33 @@ void SSGeneratorUI::btnGenerateSlot()
         default:                        break;
     }
 
-    std::vector< QString > spriteSheets;
-    bool ok = SSGenerator::generateSpriteSheets( spriteSheets, m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
+    m_spriteSheets.clear();
+    showAtlas( -1 );
+    m_currentSS = 0;
 
+    bool ok = SSGenerator::generateSpriteSheets( m_spriteSheets, m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
     if ( ok )
     {
-        // Show atlas.
-        QImage imageAtlas( spriteSheets[0] );
-        QLabel* myLabel = new QLabel;
-        myLabel->setPixmap( QPixmap::fromImage( imageAtlas ) );
-        m_ui->atlasNameLabel->setText( spriteSheets[0] );
-        QGridLayout* layout = new QGridLayout( m_ui->scrollAreaWidgetContents );
-        layout->addWidget( myLabel );
+        showAtlas( 0 );
     }
+}
+
+void SSGeneratorUI::showAtlas( const int index )
+{
+    m_atlasLabel->clear();
+    m_ui->atlasNameLabel->setText( "" );
+
+    if ( index < 0 || m_spriteSheets.empty() || index >= m_spriteSheets.size() )
+    {
+        return;
+    }
+
+    QImage imageAtlas( m_spriteSheets[index] );
+    m_atlasLabel->setPixmap( QPixmap::fromImage( imageAtlas ) );
+    m_ui->atlasNameLabel->setText( m_spriteSheets[index] );
+
+    m_currentSS = index;
+
 }
 
 SSGeneratorUI::~SSGeneratorUI()
