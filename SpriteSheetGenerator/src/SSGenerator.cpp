@@ -52,6 +52,7 @@ void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize, c
 				else
 				{
 					// Something bad happened...
+					qDebug() << "What happened?";
 				}
 			}
 		}
@@ -206,6 +207,16 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		root = nullptr;
 	}
 
+	if ( !roots.empty() )
+	{
+		for ( int i = 0; i < roots.size(); i++ )
+		{
+			delete roots[i];
+			roots[i] = nullptr;
+		}
+		roots.clear();
+	}
+
 	root = new Node();
 	if ( !automaticSize )
 	{
@@ -226,29 +237,72 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 
 	fit( images, automaticSize, fixedSize );
 
-	QString fmt = "_yyyyMMdd_hhmmss";
+	QString fmt = "yyyyMMdd_hhmmss";
 	QString time = QDateTime::currentDateTime().toString( fmt );
 
-	QImage atlas( QSize( root->w, root->h ), QImage::Format_RGBA8888 );
-	atlas.fill( Qt::transparent );
+	int indexAtlas = 0;
+	int indexImage = 0;
+	roots.push_back( root );
 
-	QPainter painter( &atlas );
-	for ( const auto& image : images )
+	bool completed = false;
+	while ( !completed )
 	{
-		// Create atlas.
-		QString imgPath( folderPath + "/" + image.filename );
-		painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
-	}
-	painter.end();
+		int imagesInAtlas = 0;
 
-	QString atlasFilename = folderPath + "/atlas" + time + ".png";
-	atlas.save( atlasFilename, "PNG" );
-	spriteSheets.push_back( atlasFilename );
+		QImage atlas( QSize( roots[indexAtlas]->w, roots[indexAtlas]->h ), QImage::Format_RGBA8888 );
+		atlas.fill( Qt::transparent );
+
+		QString atlasFilename = folderPath + "/atlas_" + QString::number( indexAtlas ) + "_" + time + ".png";
+
+		QPainter painter( &atlas );
+		for ( ; indexImage < images.size(); )
+		{
+			const auto& image = images[indexImage++];
+			QString imgPath( folderPath + "/" + image.filename );
+			painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
+			imagesInAtlas++;
+
+			if ( indexImage == images.size() )
+			{
+				completed = true;
+				break;
+			}
+
+			if ( ( indexImage != images.size() - 1 )
+				 && ( images[indexImage].fit->x == 0 )
+				 && ( images[indexImage].fit->y == 0 ) )
+			{
+				indexAtlas++;
+				break;
+			}
+		}
+		painter.end();
+
+		if ( imagesInAtlas != 0 )
+		{
+			atlas.save( atlasFilename, "PNG" );
+			spriteSheets.push_back( atlasFilename );
+		}
+		else
+		{
+			// Something bad happened...
+			qDebug() << "What happened?";
+		}
+	}
 
 	if ( root != nullptr )
 	{
-		delete root;
 		root = nullptr;
+	}
+
+	if ( !roots.empty() )
+	{
+		for ( int i = 0; i < roots.size(); i++ )
+		{
+			delete roots[i];
+			roots[i] = nullptr;
+		}
+		roots.clear();
 	}
 
 	return true;
