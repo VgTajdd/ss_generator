@@ -59,18 +59,35 @@ void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize, c
 	}
 }
 
-Node* SSGenerator::findNode( Node* root, float w, float h )
+Node* SSGenerator::findNode( Node* nodeRoot, float w, float h )
 {
-	if ( root->used )
+	if ( nodeRoot->used )
 	{
-		if ( Node* node = findNode( root->right, w, h ) )
-			return node;
-		if ( Node* node = findNode( root->down, w, h ) )
-			return node;
+		Node* downNode = findNode( nodeRoot->down, w, h );
+		Node* rightNode = findNode( nodeRoot->right, w, h );
+
+		if ( downNode != nullptr && rightNode != nullptr )
+		{
+			int newLocalWidth = nodeRoot->x + nodeRoot->w + w;
+			int newLocalHeight = nodeRoot->y + nodeRoot->h + h;
+			if ( newLocalHeight > newLocalWidth )
+			{
+				return rightNode;
+			}
+			else
+			{
+				return downNode;
+			}
+		}
+		else
+		{
+			if ( downNode ) return downNode;
+			if ( rightNode ) return rightNode;
+		}
 	}
-	else if ( ( w <= root->w ) && ( h <= root->h ) )
+	else if ( ( w <= nodeRoot->w ) && ( h <= nodeRoot->h ) )
 	{
-		return root;
+		return nodeRoot;
 	}
 	else
 	{
