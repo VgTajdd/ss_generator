@@ -41,9 +41,7 @@ void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize, c
 			{
 				// Create new root.
 				roots.push_back( root );
-				root = new Node();
-				root->w = fixedSize.width();
-				root->h = fixedSize.height();
+				root = new Node( 0, 0, fixedSize.width(), fixedSize.height() );
 
 				if ( auto node = findNode( root, block.w, block.h ) )
 				{
@@ -68,8 +66,8 @@ Node* SSGenerator::findNode( Node* nodeRoot, float w, float h )
 
 		if ( downNode != nullptr && rightNode != nullptr )
 		{
-			int newLocalWidth = nodeRoot->x + nodeRoot->w + w;
-			int newLocalHeight = nodeRoot->y + nodeRoot->h + h;
+			int newLocalWidth = rightNode->x + w;
+			int newLocalHeight = downNode->y + h;
 			if ( newLocalHeight > newLocalWidth )
 			{
 				return rightNode;
@@ -81,8 +79,8 @@ Node* SSGenerator::findNode( Node* nodeRoot, float w, float h )
 		}
 		else
 		{
-			if ( downNode ) return downNode;
 			if ( rightNode ) return rightNode;
+			if ( downNode ) return downNode;
 		}
 	}
 	else if ( ( w <= nodeRoot->w ) && ( h <= nodeRoot->h ) )
@@ -99,16 +97,8 @@ Node* SSGenerator::findNode( Node* nodeRoot, float w, float h )
 Node* SSGenerator::splitNode( Node* node, float w, float h )
 {
 	node->used = true;
-	node->down = new Node();
-	node->down->x = node->x;
-	node->down->y = node->y + h;
-	node->down->w = node->w;
-	node->down->h = node->h - h;
-	node->right = new Node();
-	node->right->x = node->x + w;
-	node->right->y = node->y;
-	node->right->w = node->w - w;
-	node->right->h = node->h;
+	node->down = new Node( node->x , node->y + h, node->w, node->h - h );
+	node->right = new Node( node->x + w, node->y, node->w - w, h );
 	return node;
 }
 
@@ -120,25 +110,18 @@ Node* SSGenerator::growNode( float w, float h )
 	bool shouldGrowRight = canGrowRight && ( root->h >= ( root->w + w ) ); // attempt to keep square-ish by growing right when height is much greater than width
 	bool shouldGrowDown = canGrowDown && ( root->w >= ( root->h + h ) ); // attempt to keep square-ish by growing down  when width  is much greater than height
 
-	if ( shouldGrowRight ) return growRight( w, h );
-	else if ( shouldGrowDown ) return growDown( w, h );
-	else if ( canGrowRight ) return growRight( w, h );
-	else if ( canGrowDown ) return growDown( w, h );
+	if ( shouldGrowRight )		return growRight( w, h );
+	else if ( shouldGrowDown )	return growDown( w, h );
+	else if ( canGrowRight )	return growRight( w, h );
+	else if ( canGrowDown )		return growDown( w, h );
 	else return nullptr; // need to ensure sensible root starting size to avoid this happening
 }
 
 Node* SSGenerator::growRight( float w, float h )
 {
-	Node* newRoot = new Node();
+	Node* newRoot = new Node( 0, 0, root->w + w, root->h );
 	newRoot->used = true;
-	newRoot->x = 0;
-	newRoot->y = 0;
-	newRoot->w = root->w + w;
-	newRoot->h = root->h;
-	Node* right = new Node();
-	right->x = root->w;
-	right->w = w;
-	right->h = root->h;
+	Node* right = new Node( root->w, 0, w, root->h );
 	newRoot->down = root;
 	newRoot->right = right;
 
@@ -156,16 +139,9 @@ Node* SSGenerator::growRight( float w, float h )
 
 Node* SSGenerator::growDown( float w, float h )
 {
-	Node* newRoot = new Node();
+	Node* newRoot = new Node( 0, 0, root->w, root->h + h );
 	newRoot->used = true;
-	newRoot->x = 0;
-	newRoot->y = 0;
-	newRoot->w = root->w;
-	newRoot->h = root->h + h;
-	Node* down = new Node();
-	down->y = root->h;
-	down->w = root->w;
-	down->h = h;
+	Node* down = new Node( 0, root->h, root->w, h );
 	newRoot->down = down;
 	newRoot->right = root;
 
@@ -180,6 +156,8 @@ Node* SSGenerator::growDown( float w, float h )
 		return nullptr;
 	}
 }
+
+#define DRAW_DEBUG
 
 bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 										const std::vector< QString >& filenames,
@@ -201,10 +179,7 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 			loadImagesFailed = true;
 			break;
 		}
-		Image imgObject;
-		imgObject.filename = filename;
-		imgObject.w = img.width();
-		imgObject.h = img.height();
+		Image imgObject( filename, img.width(), img.height() );
 		maxWidth = std::max( maxWidth, imgObject.w );
 		maxHeight = std::max( maxHeight, imgObject.h );
 		images.push_back( imgObject );
@@ -234,22 +209,17 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		roots.clear();
 	}
 
-	root = new Node();
 	if ( !automaticSize )
 	{
 		if ( maxWidth > fixedSize.width() || maxHeight > fixedSize.height() )
 		{
-			delete root;
-			root = nullptr;
 			return false;
 		}
-		root->w = fixedSize.width();
-		root->h = fixedSize.height();
+		root = new Node( 0, 0, fixedSize.width(), fixedSize.height() );
 	}
 	else
 	{
-		root->w = images[0].w;
-		root->h = images[0].h;
+		root = new Node( 0, 0, images[0].w, images[0].h );
 	}
 
 	fit( images, automaticSize, fixedSize );
@@ -260,6 +230,12 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	int indexAtlas = 0;
 	int indexImage = 0;
 	roots.push_back( root );
+
+#ifdef DRAW_DEBUG
+	QPen pen( Qt::red, 2 );
+	QFont font;
+	font.setBold( true );
+#endif
 
 	bool completed = false;
 	while ( !completed )
@@ -272,15 +248,29 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		QString atlasFilename = folderPath + "/atlas_" + QString::number( indexAtlas ) + "_" + time + ".png";
 
 		QPainter painter( &atlas );
+
+#ifdef DRAW_DEBUG
+		painter.setPen( pen );
+		painter.setFont( font );
+#endif
 		for ( ; indexImage < images.size(); )
 		{
 			const auto& image = images[indexImage++];
 			QString imgPath( folderPath + "/" + image.filename );
 			painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
+
+#ifdef DRAW_DEBUG
+			QString str( image.filename );
+			str += " | " + QString::number( image.w ) + " | " + QString::number( image.h );
+			painter.drawText( QPoint( image.fit->x, image.fit->y + 10 ), str );
+#endif
 			imagesInAtlas++;
 
 			if ( indexImage == images.size() )
 			{
+#ifdef DRAW_DEBUG
+				drawTree( &painter, roots[indexAtlas] );
+#endif
 				completed = true;
 				break;
 			}
@@ -289,6 +279,9 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 				 && ( images[indexImage].fit->x == 0 )
 				 && ( images[indexImage].fit->y == 0 ) )
 			{
+#ifdef DRAW_DEBUG
+				drawTree( &painter, roots[indexAtlas] );
+#endif
 				indexAtlas++;
 				break;
 			}
@@ -323,4 +316,19 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	}
 
 	return true;
+}
+
+void SSGenerator::drawTree( QPainter* painter, const Node* node )
+{
+	if ( node == nullptr )
+	{
+		return;
+	}
+
+	painter->setPen( QPen( node->used? Qt::green : Qt::blue, 2 ) );
+	painter->drawRect( node->x, node->y, node->w, node->h );
+	painter->setPen( QPen( Qt::red, 2 ) );
+
+	drawTree( painter, node->right );
+	drawTree( painter, node->down );
 }
