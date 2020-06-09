@@ -46,7 +46,7 @@ class SSGenerator
 	static void drawTree( QPainter* painter, const Node* indexRoot );
 public:
 	static bool generateSpriteSheets( std::vector< QString >& spriteSheetes,
-									  const std::vector<QString>& filenames,
+									  const std::vector< QString >& filenames,
 									  const QString& folderPath,
 									  const bool automaticSize,
 									  const QSize& fixedSize );

@@ -22,7 +22,9 @@ Node::~Node()
 	}
 }
 
-void SSGenerator::fit( std::vector< Image >& images, const bool automaticSize, const QSize& fixedSize )
+void SSGenerator::fit( std::vector< Image >& images, 
+					   const bool automaticSize, 
+					   const QSize& fixedSize )
 {
 	for ( int n = 0; n < images.size(); n++ )
 	{
@@ -157,7 +159,7 @@ Node* SSGenerator::growDown( float w, float h )
 	}
 }
 
-#define DRAW_DEBUG
+//#define DRAW_DEBUG
 
 bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 										const std::vector< QString >& filenames,
