@@ -5,6 +5,9 @@
 #include <QPainter>
 #include <QDateTime>
 
+#include <QFile>
+#include <QXmlStreamWriter>
+
 Node* SSGenerator::root = nullptr;
 std::vector< Node* > SSGenerator::roots;
 
@@ -22,8 +25,8 @@ Node::~Node()
 	}
 }
 
-void SSGenerator::fit( std::vector< Image >& images, 
-					   const bool automaticSize, 
+void SSGenerator::fit( std::vector< Image >& images,
+					   const bool automaticSize,
 					   const QSize& fixedSize )
 {
 	for ( int n = 0; n < images.size(); n++ )
@@ -192,7 +195,24 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		return false;
 	}
 
-	// Sort by width (descendent).
+	QString fmt = "yyyyMMdd_hhmmss";
+	QString time = QDateTime::currentDateTime().toString( fmt );
+
+	// Create XML file to save the positions dimensions of images.
+	const QString filename = folderPath + "/atlas_" + time + ".xml";
+	QFile fileXml( filename );
+	if ( !fileXml.open( QIODevice::WriteOnly ) )
+	{
+		assert( false );
+		return false;
+	}
+	::std::shared_ptr< QXmlStreamWriter > stream = std::make_shared< QXmlStreamWriter >( &fileXml );
+	stream->setAutoFormatting( true );
+	stream->setAutoFormattingIndent( 4 );
+	stream->writeStartDocument();
+	stream->writeStartElement( "sprites" );
+
+	// Sort images by width (descendent).
 	std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.w > b.w; } );
 
 	if ( root != nullptr )
@@ -224,10 +244,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		root = new Node( 0, 0, images[0].w, images[0].h );
 	}
 
+	// Bin-packing algorithm.
 	fit( images, automaticSize, fixedSize );
-
-	QString fmt = "yyyyMMdd_hhmmss";
-	QString time = QDateTime::currentDateTime().toString( fmt );
 
 	int indexAtlas = 0;
 	int indexImage = 0;
@@ -247,7 +265,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		QImage atlas( QSize( roots[indexAtlas]->w, roots[indexAtlas]->h ), QImage::Format_RGBA8888 );
 		atlas.fill( Qt::transparent );
 
-		QString atlasFilename = folderPath + "/atlas_" + QString::number( indexAtlas ) + "_" + time + ".png";
+		QString atlasFilename = "atlas_" + QString::number( indexAtlas ) + "_" + time + ".png";
+		QString atlasFilepath = folderPath + "/" + atlasFilename;
 
 		QPainter painter( &atlas );
 
@@ -260,6 +279,13 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 			const auto& image = images[indexImage++];
 			QString imgPath( folderPath + "/" + image.filename );
 			painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
+
+			stream->writeEmptyElement( "sprite" );
+			stream->writeAttribute( "x", QString::number( image.fit->x ) );
+			stream->writeAttribute( "y", QString::number( image.fit->y ) );
+			stream->writeAttribute( "w", QString::number( image.fit->w ) );
+			stream->writeAttribute( "h", QString::number( image.fit->h ) );
+			stream->writeAttribute( "a", atlasFilename );
 
 #ifdef DRAW_DEBUG
 			QString str( image.filename );
@@ -292,8 +318,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 
 		if ( imagesInAtlas != 0 )
 		{
-			atlas.save( atlasFilename, "PNG" );
-			spriteSheets.push_back( atlasFilename );
+			atlas.save( atlasFilepath, "PNG" );
+			spriteSheets.push_back( atlasFilepath );
 		}
 		else
 		{
@@ -301,6 +327,10 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 			qDebug() << "What happened?";
 		}
 	}
+
+	stream->writeEndElement();
+	stream->writeEndDocument();
+	fileXml.close();
 
 	if ( root != nullptr )
 	{
