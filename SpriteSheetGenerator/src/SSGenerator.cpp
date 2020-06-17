@@ -187,7 +187,7 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		Image imgObject( filename, img.width(), img.height() );
 		maxWidth = std::max( maxWidth, imgObject.w );
 		maxHeight = std::max( maxHeight, imgObject.h );
-		images.push_back( imgObject );
+		images.push_back( std::move( imgObject ) );
 	}
 
 	if ( loadImagesFailed )
@@ -250,6 +250,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	int indexAtlas = 0;
 	int indexImage = 0;
 	roots.push_back( root );
+
+	std::vector< Image > atlasArray;
 
 #ifdef DRAW_DEBUG
 	QPen pen( Qt::red, 2 );
@@ -320,12 +322,24 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		{
 			atlas.save( atlasFilepath, "PNG" );
 			spriteSheets.push_back( atlasFilepath );
+			atlasArray.emplace_back( atlasFilename, roots[indexAtlas]->w, roots[indexAtlas]->h );
 		}
 		else
 		{
 			// Something bad happened...
 			qDebug() << "What happened?";
 		}
+	}
+
+	stream->writeEndElement();
+
+	stream->writeStartElement( "spritesheets" );
+	for ( const auto& atlas : atlasArray )
+	{
+		stream->writeEmptyElement( "atlas" );
+		stream->writeAttribute( "a", atlas.filename );
+		stream->writeAttribute( "w", QString::number( atlas.w ) );
+		stream->writeAttribute( "h", QString::number( atlas.h ) );
 	}
 
 	stream->writeEndElement();
