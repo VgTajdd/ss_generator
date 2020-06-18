@@ -285,8 +285,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 			stream->writeEmptyElement( "sprite" );
 			stream->writeAttribute( "x", QString::number( image.fit->x ) );
 			stream->writeAttribute( "y", QString::number( image.fit->y ) );
-			stream->writeAttribute( "w", QString::number( image.fit->w ) );
-			stream->writeAttribute( "h", QString::number( image.fit->h ) );
+			stream->writeAttribute( "w", QString::number( image.w ) );
+			stream->writeAttribute( "h", QString::number( image.h ) );
 			stream->writeAttribute( "a", atlasFilename );
 
 #ifdef DRAW_DEBUG
