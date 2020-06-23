@@ -22,6 +22,18 @@ SSGeneratorUI::SSGeneratorUI( QWidget* parent ) :
     m_ui->comboBox->addItem( "1024 x 1024" );
     m_ui->comboBox->addItem( "2048 x 2048" );
 
+    std::map< SSGenerator::SORT_BY, const char* > mapItemNames;
+    mapItemNames.emplace( SSGenerator::SORT_BY::WIDTH, "Width" );
+    mapItemNames.emplace( SSGenerator::SORT_BY::HEIGHT, "Height" );
+    mapItemNames.emplace( SSGenerator::SORT_BY::WIDER_SIDE, "Wider side" );
+    mapItemNames.emplace( SSGenerator::SORT_BY::AREA, "Area" );
+
+    const int totalSortByItems = (int) SSGenerator::SORT_BY::TOTAL;
+    for ( int i = 0; i < totalSortByItems; i++ )
+    {
+        m_ui->comboBoxSortBy->addItem( mapItemNames[( SSGenerator::SORT_BY )i] );
+    }
+
     m_atlasLabel = new QLabel;
     QGridLayout* layout = new QGridLayout( m_ui->scrollAreaWidgetContents );
     layout->addWidget( m_atlasLabel );

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>752</width>
-    <height>458</height>
+    <width>797</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,14 +52,38 @@
        <widget class="QListWidget" name="listWidget"/>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox">
-        <property name="text">
-         <string>Automatic size</string>
+       <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Sort by</string>
         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QComboBox" name="comboBoxSortBy"/>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Size</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QComboBox" name="comboBox"/>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="text">
+            <string>Automatic size</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="generateButton">
@@ -82,8 +106,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>358</width>
-           <height>344</height>
+           <width>380</width>
+           <height>537</height>
           </rect>
          </property>
         </widget>
@@ -155,7 +179,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>752</width>
+     <width>797</width>
      <height>20</height>
     </rect>
    </property>

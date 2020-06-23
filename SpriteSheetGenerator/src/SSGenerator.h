@@ -45,6 +45,15 @@ class SSGenerator
 	static Node* growDown( float w, float h );
 	static void drawTree( QPainter* painter, const Node* indexRoot );
 public:
+	enum class SORT_BY
+	{
+		WIDTH,
+		HEIGHT,
+		WIDER_SIDE,
+		AREA,
+		TOTAL
+	};
+public:
 	static bool generateSpriteSheets( std::vector< QString >& spriteSheetes,
 									  const std::vector< QString >& filenames,
 									  const QString& folderPath,
