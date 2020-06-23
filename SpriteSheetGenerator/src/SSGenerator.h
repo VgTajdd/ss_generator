@@ -33,6 +33,17 @@ struct Image
 
 class SSGenerator
 {
+public:
+	enum class SORT_BY
+	{
+		WIDTH,
+		HEIGHT,
+		WIDER_SIDE,
+		AREA,
+		TOTAL
+	};
+
+private:
 	static Node* root;
 	static std::vector< Node* > roots;
 	static void fit( std::vector< Image >& images,
@@ -43,22 +54,16 @@ class SSGenerator
 	static Node* growNode( float w, float h );
 	static Node* growRight( float w, float h );
 	static Node* growDown( float w, float h );
+	static void sortImages( std::vector<Image>& images, const SORT_BY& sortBy );
 	static void drawTree( QPainter* painter, const Node* indexRoot );
-public:
-	enum class SORT_BY
-	{
-		WIDTH,
-		HEIGHT,
-		WIDER_SIDE,
-		AREA,
-		TOTAL
-	};
+
 public:
 	static bool generateSpriteSheets( std::vector< QString >& spriteSheetes,
 									  const std::vector< QString >& filenames,
 									  const QString& folderPath,
 									  const bool automaticSize,
-									  const QSize& fixedSize );
+									  const QSize& fixedSize,
+									  const SORT_BY& sortBy );
 };
 
 #endif

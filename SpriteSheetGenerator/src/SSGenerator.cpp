@@ -168,7 +168,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 										const std::vector< QString >& filenames,
 										const QString& folderPath,
 										const bool automaticSize,
-										const QSize& fixedSize )
+										const QSize& fixedSize,
+										const SORT_BY& sortBy )
 {
 	std::vector< Image > images;
 
@@ -212,8 +213,8 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	stream->writeStartDocument();
 	stream->writeStartElement( "sprites" );
 
-	// Sort images by width (descendent).
-	std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.w > b.w; } );
+	// Sort images.
+	sortImages( images, sortBy );
 
 	if ( root != nullptr )
 	{
@@ -362,6 +363,28 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	}
 
 	return true;
+}
+
+void SSGenerator::sortImages( std::vector<Image>& images, const SORT_BY& sortBy )
+{
+	switch ( sortBy )
+	{
+		case SORT_BY::WIDTH:
+			std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.w > b.w; } );
+			break;
+		case SORT_BY::HEIGHT:
+			std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.h > b.h; } );
+			break;
+		case SORT_BY::WIDER_SIDE:
+			std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return std::max( a.w, a.h ) > std::max( b.w, b.h ); } );
+			break;
+		case SORT_BY::AREA:
+			std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return ( a.w * a.h ) > ( b.w * b.h ); } );
+			break;
+		default:
+			std::sort( images.begin(), images.end(), []( const Image& a, const Image& b ) { return a.w > b.w; } );
+			break;
+	}
 }
 
 void SSGenerator::drawTree( QPainter* painter, const Node* node )

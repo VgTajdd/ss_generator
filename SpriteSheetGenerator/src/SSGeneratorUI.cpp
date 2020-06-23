@@ -139,7 +139,14 @@ void SSGeneratorUI::btnGenerateSlot()
     showAtlas( -1 );
     m_currentSS = 0;
 
-    bool ok = SSGenerator::generateSpriteSheets( m_spriteSheets, m_filenames, m_ui->folderLabel->text(), m_ui->checkBox->isChecked(), size );
+    SSGenerator::SORT_BY sortBy = ( SSGenerator::SORT_BY ) m_ui->comboBoxSortBy->currentIndex();
+
+    bool ok = SSGenerator::generateSpriteSheets( m_spriteSheets,
+                                                 m_filenames,
+                                                 m_ui->folderLabel->text(),
+                                                 m_ui->checkBox->isChecked(),
+                                                 size,
+                                                 sortBy );
     if ( ok )
     {
         showAtlas( 0 );
