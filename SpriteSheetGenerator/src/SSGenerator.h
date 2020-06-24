@@ -24,11 +24,12 @@ struct Node
 struct Image
 {
 	Image( const QString& _filename, const int _w, const int _h )
-		: filename( _filename ), w( _w ), h( _h ), fit( nullptr ) { }
+		: filename( _filename ), w( _w ), h( _h ), fit( nullptr ), indexAtlas( 0 ) {}
 	QString filename;
 	Node* fit;
 	int w;
 	int h;
+	int indexAtlas;
 };
 
 class SSGenerator

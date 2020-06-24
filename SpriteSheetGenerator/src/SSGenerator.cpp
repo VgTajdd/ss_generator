@@ -32,7 +32,28 @@ void SSGenerator::fit( std::vector< Image >& images,
 	for ( int n = 0; n < images.size(); n++ )
 	{
 		auto& block = images[n];
-		if ( auto node = findNode( root, block.w, block.h ) )
+
+		Node* node = nullptr;
+		for ( int i = 0; i < roots.size(); i++ )
+		{
+			auto& r = roots[i];
+			node = findNode( r, block.w, block.h );
+			if ( node != nullptr )
+			{
+				block.indexAtlas = i;
+				break;
+			}
+		}
+
+		if ( node == nullptr )
+		{
+			if ( node = findNode( root, block.w, block.h ) )
+			{
+				block.indexAtlas = (int) roots.size();
+			}
+		}
+
+		if ( node != nullptr )
 		{
 			block.fit = splitNode( node, block.w, block.h );
 		}
@@ -51,6 +72,7 @@ void SSGenerator::fit( std::vector< Image >& images,
 				if ( auto node = findNode( root, block.w, block.h ) )
 				{
 					block.fit = splitNode( node, block.w, block.h );
+					block.indexAtlas = (int) roots.size();
 				}
 				else
 				{
@@ -248,8 +270,6 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	// Bin-packing algorithm.
 	fit( images, automaticSize, fixedSize );
 
-	int indexAtlas = 0;
-	int indexImage = 0;
 	roots.push_back( root );
 
 	std::vector< Image > atlasArray;
@@ -260,8 +280,7 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 	font.setBold( true );
 #endif
 
-	bool completed = false;
-	while ( !completed )
+	for ( size_t indexAtlas = 0; indexAtlas < roots.size(); indexAtlas++ )
 	{
 		int imagesInAtlas = 0;
 
@@ -277,9 +296,12 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 		painter.setPen( pen );
 		painter.setFont( font );
 #endif
-		for ( ; indexImage < images.size(); )
+		for ( int indexImage = 0; indexImage < images.size(); indexImage++ )
 		{
-			const auto& image = images[indexImage++];
+			const auto& image = images[indexImage];
+
+			if ( image.indexAtlas != indexAtlas ) { continue; }
+
 			QString imgPath( folderPath + "/" + image.filename );
 			painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
 
@@ -297,25 +319,9 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 #endif
 			imagesInAtlas++;
 
-			if ( indexImage == images.size() )
-			{
 #ifdef DRAW_DEBUG
-				drawTree( &painter, roots[indexAtlas] );
+			drawTree( &painter, roots[indexAtlas] );
 #endif
-				completed = true;
-				break;
-			}
-
-			if ( ( indexImage != images.size() - 1 )
-				 && ( images[indexImage].fit->x == 0 )
-				 && ( images[indexImage].fit->y == 0 ) )
-			{
-#ifdef DRAW_DEBUG
-				drawTree( &painter, roots[indexAtlas] );
-#endif
-				indexAtlas++;
-				break;
-			}
 		}
 		painter.end();
 
