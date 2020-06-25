@@ -306,6 +306,7 @@ bool SSGenerator::generateSpriteSheets( std::vector< QString >& spriteSheets,
 			painter.drawImage( QPoint( image.fit->x, image.fit->y ), QImage( imgPath ) );
 
 			stream->writeEmptyElement( "sprite" );
+			stream->writeAttribute( "n", image.filename );
 			stream->writeAttribute( "x", QString::number( image.fit->x ) );
 			stream->writeAttribute( "y", QString::number( image.fit->y ) );
 			stream->writeAttribute( "w", QString::number( image.w ) );
