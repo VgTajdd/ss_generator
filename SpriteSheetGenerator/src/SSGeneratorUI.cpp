@@ -47,10 +47,12 @@ SSGeneratorUI::SSGeneratorUI( QWidget* parent ) :
     } );
     connect( m_ui->nextAtlasButton, &QPushButton::clicked, [this]()
     {
+        if ( this->m_spriteSheets.empty() ) return;
         this->showAtlas( ( this->m_currentSS + 1 ) % (int) this->m_spriteSheets.size() );
     } );
     connect( m_ui->previousAtlasButton, &QPushButton::clicked, [this]()
     {
+        if ( this->m_spriteSheets.empty() ) return;
         this->showAtlas( ( this->m_currentSS - 1 ) % (int) this->m_spriteSheets.size() );
     } );
 }
