@@ -1,3 +1,9 @@
+// ========================================================================= //
+// Copyright (c) 2020 Agustin Jesus Durand Diaz.                             //
+// This code is licensed under the MIT license.                              //
+// main.cpp                                                                  //
+// ========================================================================= //
+
 #include <QApplication>
 #include "SSGeneratorUI.h"
 

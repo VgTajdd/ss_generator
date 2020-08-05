@@ -1,3 +1,9 @@
+// ========================================================================= //
+// Copyright (c) 2020 Agustin Jesus Durand Diaz.                             //
+// This code is licensed under the MIT license.                              //
+// SSGenerator.h                                                             //
+// ========================================================================= //
+
 #ifndef SS_GENERATOR_H
 #define SS_GENERATOR_H
 
