@@ -11,4 +11,4 @@
 
 ## OPTIONAL
 
-- [ ] Include .editorconfig
+- [X] Include .editorconfig
